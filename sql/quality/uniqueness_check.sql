@@ -26,6 +26,7 @@ FROM (
 
 UNION ALL
 
+-- Customers: duplicate customer_ids
 SELECT
     'src_customers'      AS source_table,
     'duplicate_identifier'      AS check_type,
