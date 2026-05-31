@@ -30,5 +30,4 @@ DO UPDATE SET
     country    = EXCLUDED.country,
     created_at = EXCLUDED.created_at,
     row_hash   = EXCLUDED.row_hash,
-    loaded_at  = EXCLUDED.loaded_at
-WHERE stg_customers.row_hash != EXCLUDED.row_hash;
+    loaded_at  = EXCLUDED.loaded_at;
