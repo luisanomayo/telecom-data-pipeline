@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS agg_user_revenue (
     last_updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE agg_user_revenue
-ALTER COLUMN total_revenue SET DATA TYPE NUMERIC;
+--ALTER TABLE agg_user_revenue
+--ALTER COLUMN total_revenue SET DATA TYPE NUMERIC;
