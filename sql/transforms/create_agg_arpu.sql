@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS agg_arpu (
+    customer_id BIGINT PRIMARY KEY,
+    arpu NUMERIC NOT NULL DEFAULT 0,
+    last_updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
