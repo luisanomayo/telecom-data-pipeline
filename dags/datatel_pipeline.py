@@ -182,7 +182,7 @@ with DAG(
     export_to_gcs = PostgresToGCSOperator(
         task_id='export_to_gcs',
         postgres_conn_id='postgres_conn_id',
-        google_cloud_storage_conn_id='google_cloud_default',
+        gcp_conn_id='google_cloud_default',
         sql='sql/warehouse/postgres_to_gcs.sql',
         bucket=GCS_BUCKET,
         filename='exports/dw_user_analytics_{{ds}}.csv',
@@ -199,7 +199,6 @@ with DAG(
         source_format='CSV',
         skip_leading_rows=1,
         write_disposition='WRITE_TRUNCATE',
-        auto_detect=True,
     )
 
     merge_dw_user_analytics = BigQueryInsertJobOperator(

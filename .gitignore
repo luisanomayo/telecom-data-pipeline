@@ -23,6 +23,7 @@ airflow.db
 logs/
 airflow-webserver.pid
 standalone_admin_password.txt
+plugins/
 
 #macOS
 .DS_Store
