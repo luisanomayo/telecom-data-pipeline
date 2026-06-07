@@ -1,5 +1,5 @@
-MERGE  `altschool-projects-495218.datatel.dw_user_analytics` AS target
-USING `altschool-projects-495218.datatel.stg_user_analytics` AS source
+MERGE  `{{params.bq_project}}.{{params.bq_dataset}}.{{params.bq_table}}` AS target
+USING `{}` AS source
 ON target.customer_id = source.customer_id
 WHEN MATCHED THEN
   UPDATE SET
