@@ -5,8 +5,8 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 
 
-BQ_PROJECT = Variable.get("BQ_PROJECT")
-BQ_DATASET = Variable.get("BQ_DATASET")
+BQ_PROJECT = Variable.get("BQ_PROJECT", default_var="placeholder")
+BQ_DATASET = Variable.get("BQ_DATASET", default_var="placeholder")
 
 with DAG(
     dag_id='datatel_init',
@@ -110,9 +110,8 @@ with DAG(
         },
     )
 
-    create_watermark_table >> seed_watermarks
-
-    [
+    # Postgres tables can all be created in parallel
+    postgres_tables = [
         create_quarantine_table,
         create_watermark_table,
         create_stg_billings,
@@ -124,6 +123,11 @@ with DAG(
         create_agg_arpu,
         create_session_buckets,
         create_agg_session_distribution,
-        create_bq_stg_user_analytics,
-        create_bq_dw_user_analytics,
     ]
+
+    # Watermark must be seeded after the table exists
+    create_watermark_table >> seed_watermarks
+
+    # BQ tables created after all Postgres setup is done
+    postgres_tables >> create_bq_stg_user_analytics
+    postgres_tables >> create_bq_dw_user_analytics

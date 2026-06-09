@@ -10,11 +10,11 @@ from airflow.utils.trigger_rule import TriggerRule
 from airflow.models.param import Param
 
 
-GCS_BUCKET = Variable.get("GCS_BUCKET")
-BQ_PROJECT = Variable.get("BQ_PROJECT")
-BQ_DATASET = Variable.get("BQ_DATASET")
-BQ_TABLE = Variable.get("BQ_TABLE")
-BQ_STAGING = Variable.get("BQ_STAGING")
+GCS_BUCKET = Variable.get("GCS_BUCKET", default_var="placeholder")
+BQ_PROJECT = Variable.get("BQ_PROJECT", default_var="placeholder")
+BQ_DATASET = Variable.get("BQ_DATASET", default_var="placeholder")
+BQ_TABLE = Variable.get("BQ_TABLE", default_var="placeholder")
+BQ_STAGING = Variable.get("BQ_STAGING", default_var="placeholder")
 
 default_args = {
     'owner': 'airflow',
