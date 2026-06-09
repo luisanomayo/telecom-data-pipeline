@@ -34,31 +34,47 @@ PostgreSQL (source) → Staging tables → Aggregates → GCS → BigQuery
 
 ## Prerequisites
 
-- Python 3.12
-- Apache Airflow 2.10.4
-- PostgreSQL
+- Docker Desktop
+- PostgreSQL (local instance)
 - GCP project with BigQuery and GCS enabled
+- Service account with BigQuery Job User and BigQuery Data Editor roles
+
+## Running Airflow
+
+**Docker is the recommended way to run this project**, especially on macOS. Running Airflow directly on macOS Apple Silicon (M1/M2) causes crashes due to a known incompatibility between grpcio and Python's fork model.
+
+The included `docker-compose.yaml` uses **LocalExecutor** — a lightweight configuration that runs tasks directly in the scheduler process without Redis or Celery workers. This keeps memory usage low enough to run comfortably on an 8GB MacBook Air.
+
+It runs three containers: `postgres` (Airflow metadata), `airflow-webserver`, and `airflow-scheduler`.
+
+**Start Airflow**
+
+```bash
+docker compose up -d
+```
+
+Then open `http://localhost:8080` (default credentials: `airflow` / `airflow`).
+
+**Stop Airflow**
+
+```bash
+docker compose down
+```
 
 ## Setup
 
-**1. Clone and install dependencies**
+**1. Clone the repo**
 
 ```bash
 git clone <repo-url>
 cd datatel_pipeline
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
 ```
 
-**2. Configure environment**
-
-```bash
-cp config/.env.example .env
-# Fill in your values
-```
+**2. Start Airflow (see above)**
 
 **3. Set Airflow variables**
+
+In the UI: Admin → Variables. Add:
 
 ```
 GCS_BUCKET
@@ -70,18 +86,22 @@ BQ_STAGING
 
 **4. Set Airflow connections**
 
-| Connection ID | Type |
-|---|---|
-| `postgres_conn_id` | PostgreSQL |
-| `google_cloud_default` | Google Cloud |
+In the UI: Admin → Connections. Add:
+
+| Connection ID | Type | Notes |
+|---|---|---|
+| `postgres_conn_id` | PostgreSQL | Host: `host.docker.internal`, Port: `5432` |
+| `google_cloud_default` | Google Cloud | Keyfile JSON from your GCP service account |
 
 **5. Initialize the schema**
 
-Trigger `datatel_init` manually once from the Airflow UI. This creates all tables and seeds the watermark table.
+Trigger `datatel_init` manually once from the Airflow UI. This creates all Postgres and BigQuery tables and seeds the watermark table. Run it only once — it uses `CREATE TABLE IF NOT EXISTS` so re-running is safe but unnecessary.
 
 **6. Run the pipeline**
 
-`datatel_pipeline` runs on a daily schedule. You can also trigger it manually with optional params:
+`datatel_pipeline` runs on a daily schedule. Pause it from the DAGs list (toggle next to the DAG name) if you don't want it running automatically.
+
+You can also trigger it manually with a specific date:
 
 ```json
 {
@@ -89,6 +109,12 @@ Trigger `datatel_init` manually once from the Airflow UI. This creates all table
   "start_date": "2025-01-15",
   "end_date": "2025-01-15"
 }
+```
+
+The `run_date` must match a date that exists in your source tables (`src_billing_transactions`, `src_network_sessions`). The freshness check at the start of the pipeline will fail if no data is found for that date. To find a valid date range:
+
+```sql
+SELECT MIN(transaction_date), MAX(transaction_date) FROM src_billing_transactions;
 ```
 
 ## Project Structure
