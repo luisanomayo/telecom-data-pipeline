@@ -53,7 +53,7 @@ It runs three containers: `postgres` (Airflow metadata), `airflow-webserver`, an
 docker compose up -d
 ```
 
-Then open `http://localhost:8080` (default credentials: `airflow` / `airflow`).
+Then open `http://localhost:8080`.
 
 **Stop Airflow**
 
@@ -90,7 +90,7 @@ In the UI: Admin → Connections. Add:
 
 | Connection ID | Type | Notes |
 |---|---|---|
-| `postgres_conn_id` | PostgreSQL | Host: `host.docker.internal`, Port: `5432` |
+| `postgres_conn_id` | PostgreSQL | Host: `host.docker.internal`, Port: `XXXX` |
 | `google_cloud_default` | Google Cloud | Keyfile JSON from your GCP service account |
 
 **5. Initialize the schema**
